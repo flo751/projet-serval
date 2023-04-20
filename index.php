@@ -4,9 +4,10 @@
     {require $classe . '.class.php';}
     spl_autoload_register('chargerClasse');
 
-    $DB = new DataBase;
-    $baseclass = new Baseclass;
-
+    $database = new DataBase();
+    $baseclass = new Baseclass();
+    
+    if(empty($_POST)){$baseclass->init();}
     /*if(!isset ($_POST['turnleft'])){
          $baseclass->_Turnleft();
     }
@@ -25,7 +26,7 @@
     if(!isset ($_POST['down'])){
          $baseclass->_goBack();
     }*/
-
+    var_dump($baseclass);
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -44,22 +45,22 @@
                     <div class="control">
                         <button type="submit" name="turnleft">\</button>
                         <button type="submit" name="up" <?php if($baseclass->_checkForward() == FALSE){
-                            echo 'disable';
+                            echo 'disabled';
                         } ?>>^</button>
                         <button type="submit" name="turnright">/</button>
                     </div>
                     <div>
                         <button type="submit" name="left" <?php if($baseclass->_checkLeft() == FALSE){
-                            echo 'disable';
+                            echo 'disabled';
                         } ?>><</button>
                         <button type="submit" name="action">X</button>
                         <button type="submit" name="right" <?php if($baseclass->_checkRight() == FALSE){
-                            echo 'disable';
+                            echo 'disabled';
                         } ?>>></button>
                     </div>
                     <div>
                         <button type="submit" name="down" <?php if($baseclass->_checkBack() == FALSE){
-                            echo 'disable';
+                            echo 'disabled';
                         } ?>>V</button>
                     </div>
                 </form>

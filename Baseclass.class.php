@@ -4,12 +4,12 @@ class Baseclass{
     protected $_currentY;
     protected $_currentAngle;
     protected $_dbh; 
+    
 
     public function _construct(){
-        $this->_dbh = new Database();
-        $this->_currentX = 0; 
-        $this->_currentY = 1;
-        $this->_currentAngle = 0;
+        $this->_dbh = new DataBase();
+        error_log($_dbh);
+
     }
 
     public function setcurrentx(int $_currentX){
@@ -36,17 +36,24 @@ class Baseclass{
         return $this->_currentAngle;
     }
 
+    public function init(){
+        $this->_currentX = 0; 
+        $this->_currentY = 1;
+        $this->_currentAngle = 0;
+    }
+    
     private function _checkMove(int $newX, int $newY, int $_currentAngle){
 
         $stmt = $this->_dbh->prepare("SELECT * FROM map WHERE coordx= $newX AND coordy = $newY AND
         direction= $_currentAngle");
         $stmt->execute();
-        $result = $stmt->fetchALL(PDO::FETCH_ASSOC);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if(!empty($result)){
             return TRUE;
         }else{
             return FALSE;
         }
+        
     }
 
     public function _checkForward(){
