@@ -6,9 +6,8 @@ class Baseclass{
     protected $_dbh; 
     
 
-    public function _construct(){
+    public function __construct(){
         $this->_dbh = new DataBase();
-        error_log($_dbh);
 
     }
 
@@ -142,17 +141,85 @@ class Baseclass{
     }
 
    
-    
-    public function _goForward(int $_currentX, int $_currentY, int $_currentAngle){
+     
+    public function _goForward(){
 
+
+        $newX = $this->_currentX;
+        $newY = $this->_currentY;
+        
+        switch($this->_currentAngle){
+        case 0:
+            $newX++;
+            break;
+        case 90:
+            $newY++;
+            break;
+        case 180:
+            $newX--;
+            break;
+        case 270:
+            $newY--;
+            break;
+    }
     }
     public function _goBack(){
+        $newX = $this->_currentX;
+        $newY = $this->_currentY;
         
+        switch($this->_currentAngle){
+        case 0:
+            $newX--;
+            break;
+        case 90:
+            $newY--;
+            break;
+        case 180:
+            $newX++;
+            break;
+        case 270:
+            $newY++;
+            break;
+    }
     }
     public function _goRight(){
+        $newX = $this->_currentX;
+        $newY = $this->_currentY;
+        
+        switch($this->_currentAngle){
+        case 0:
+            $newY--;
+            break;
+        case 90:
+            $newX++;
+            break;
+        case 180:
+            $newY++;
+            break;
+        case 270:
+            $newX++;
+            break;
+    }
         
     }
-    public function _goLerf(){
+    public function _goLeft(){
+        $newX = $this->_currentX;
+        $newY = $this->_currentY;
+        
+        switch($this->_currentAngle){
+            case 0:
+                $newY++;
+                break;
+            case 90:
+                $newX--;
+                break;
+            case 180:
+                $newY--;
+                break;
+            case 270:
+                $newX++;
+                break;
+    }
         
     }
     public function _TurnRight(){
