@@ -140,7 +140,12 @@ class Baseclass{
     return $this->_checkMove($newX,$newY,$this->_currentAngle);
     }
 
-   
+    private function _goMoov(){
+        $stmt = $this->_dbh->prepare("SELECT * FROM map 
+        JOIN image ON map.id = image.map_id");
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
      
     public function _goForward(){
 
@@ -161,7 +166,13 @@ class Baseclass{
         case 270:
             $newY--;
             break;
-    }
+            default:
+            break;
+        }
+            $this->_currentX= $newX;
+            $this->_currentY= $newY;
+            return $this->_goMoov($this->_currentX,$this->_currentY,$this->_currentAngle);
+    
     }
     public function _goBack(){
         $newX = $this->_currentX;
@@ -181,6 +192,11 @@ class Baseclass{
             $newY++;
             break;
     }
+        $this->_currentX= $newX;
+        $this->_currentY= $newY;
+
+        return $this->_goMoov($this->_currentX,$this->_currentY,$this->_currentAngle);
+
     }
     public function _goRight(){
         $newX = $this->_currentX;
@@ -200,7 +216,10 @@ class Baseclass{
             $newX++;
             break;
     }
-        
+        $this->_currentX= $newX;
+        $this->_currentY= $newY;
+
+        return $this->_goMoov($this->_currentX,$this->_currentY,$this->_currentAngle);
     }
     public function _goLeft(){
         $newX = $this->_currentX;
@@ -220,7 +239,10 @@ class Baseclass{
                 $newX++;
                 break;
     }
-        
+        $this->_currentX= $newX;
+        $this->_currentY= $newY;
+
+        return $this->_goMoov($this->_currentX,$this->_currentY,$this->_currentAngle);
     }
     public function _TurnRight(){
         

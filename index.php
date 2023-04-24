@@ -7,10 +7,16 @@
     $database = new DataBase();
     $baseclass = new Baseclass();
     
-    if(empty($_POST)){$baseclass->init();}
-    /*if(!isset ($_POST['turnleft'])){
-         $baseclass->_Turnleft();
+    if(empty($_POST)){$baseclass->init();
+    }else{
+        $baseclass->setcurrentx($_POST['X']);
+        $baseclass->setcurrenty($_POST['Y']);
+        $baseclass->setcurrentangle($_POST['Angle']);
     }
+
+    if(!isset ($_POST['turnleft'])){
+        $baseclass->_TurnLeft();
+   }
     if(!isset ($_POST['turnright'])){
          $baseclass->_TurnRight();
     }
@@ -25,7 +31,7 @@
     }
     if(!isset ($_POST['down'])){
          $baseclass->_goBack();
-    }*/
+    }
     var_dump($baseclass);
 ?>
 <!DOCTYPE HTML>
@@ -72,5 +78,8 @@
     </div>
     <div class="text">
     </div>
+    <input type="hidden" name="X" value="<?php echo $baseclass->getcurrentx(); ?>">
+    <input type="hidden" name="Y" value="<?php echo $baseclass->getcurrenty(); ?>">
+    <input type="hidden" name="Angle" value="<?php echo $baseclass->getcurrentangle(); ?>">
     </body>
 </html>
