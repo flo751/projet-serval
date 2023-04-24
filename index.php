@@ -6,33 +6,35 @@
 
     $database = new DataBase();
     $baseclass = new Baseclass();
+    $firstpersonneview = new FirstPersonView();
     
     if(empty($_POST)){$baseclass->init();
     }else{
-        $baseclass->setcurrentx($_POST['X']);
-        $baseclass->setcurrenty($_POST['Y']);
-        $baseclass->setcurrentangle($_POST['Angle']);
+        $baseclass->set_currentx($_POST['X']);
+        $baseclass->set_currenty($_POST['Y']);
+        $baseclass->set_currentangle($_POST['Angle']);
+        $baseclass->set_currentmap($_POST['Map']);
     }
 
-    if(!isset ($_POST['turnleft'])){
+    if(isset ($_POST['turnleft'])){
         $baseclass->_TurnLeft();
    }
-    if(!isset ($_POST['turnright'])){
+   if(isset ($_POST['up'])){
+        $baseclass->_goForward();
+    }
+    if(isset ($_POST['turnright'])){
          $baseclass->_TurnRight();
     }
-    if(!isset ($_POST['up'])){
-         $baseclass->_goForward();
-    }
-    if(!isset ($_POST['left'])){
+    if(isset ($_POST['left'])){
          $baseclass->_goLeft();
     }
-    if(!isset ($_POST['right'])){
+    if(isset ($_POST['right'])){
          $baseclass->_goRight();
     }
-    if(!isset ($_POST['down'])){
+    if(isset ($_POST['down'])){
          $baseclass->_goBack();
     }
-    var_dump($baseclass);
+    
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -43,11 +45,11 @@
 </head>
 <body>
     <div class="background">
-        
+        <img src="./images/<?php echo $baseclass->get_currentmap(); ?>">
     </div>
         <div class="buttons">
             <table>
-                <form>
+                <form method='POST' action='index.php'>
                     <div class="control">
                         <button type="submit" name="turnleft">\</button>
                         <button type="submit" name="up" <?php if($baseclass->_checkForward() == FALSE){
@@ -69,6 +71,10 @@
                             echo 'disabled';
                         } ?>>V</button>
                     </div>
+                    <input type="hidden" name="X" value="<?php echo $baseclass->get_currentx(); ?>">
+                    <input type="hidden" name="Y" value="<?php echo $baseclass->get_currenty(); ?>">
+                    <input type="hidden" name="Angle" value="<?php echo $baseclass->get_currentangle(); ?>">
+                    <input type="hidden" name="Map" value="<?php echo $baseclass->get_currentmap(); ?>">
                 </form>
             </table>
         </div>
@@ -78,8 +84,7 @@
     </div>
     <div class="text">
     </div>
-    <input type="hidden" name="X" value="<?php echo $baseclass->getcurrentx(); ?>">
-    <input type="hidden" name="Y" value="<?php echo $baseclass->getcurrenty(); ?>">
-    <input type="hidden" name="Angle" value="<?php echo $baseclass->getcurrentangle(); ?>">
+    
     </body>
+    <?php var_dump($baseclass); ?>
 </html>

@@ -3,6 +3,7 @@ class Baseclass{
     protected $_currentX; 
     protected $_currentY;
     protected $_currentAngle;
+    protected $_currentMap;
     protected $_dbh; 
     
 
@@ -11,34 +12,42 @@ class Baseclass{
 
     }
 
-    public function setcurrentx(int $_currentX){
+    public function set_currentx(int $_currentX){
         $this->_currentX = $_currentX;
     }
 
-    public function getcurrentx(){
+    public function get_currentx(){
          return $this->_currentX;
     }
 
-    public function setcurrenty(int $_currentY){
+    public function set_currenty(int $_currentY){
         $this->_currentY = $_currentY;
     }
 
-    public function getcurrenty(){
+    public function get_currenty(){
         return $this->_currentY;
     }
 
-    public function setcurrentangle(int $_currentAngle){
+    public function set_currentangle(int $_currentAngle){
         $this->_currentAngle = $_currentAngle;
     }
 
-    public function getcurrentangle(){
+    public function get_currentangle(){
         return $this->_currentAngle;
     }
 
+    public function set_currentmap(str $_currentMap){
+        $this->_currentMap = $_currentMap;
+    }
+
+    public function get_currentmap(){
+         return $this->_currentMap;
+    }
     public function init(){
         $this->_currentX = 0; 
         $this->_currentY = 1;
         $this->_currentAngle = 0;
+        $this->_currentMap =  "01-0.jpg";
     }
     
     private function _checkMove(int $newX, int $newY, int $_currentAngle){
@@ -139,20 +148,12 @@ class Baseclass{
     }
     return $this->_checkMove($newX,$newY,$this->_currentAngle);
     }
-
-    private function _goMoov(){
-        $stmt = $this->_dbh->prepare("SELECT * FROM map 
-        JOIN image ON map.id = image.map_id");
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    }
      
     public function _goForward(){
-
+        error_log('_goForward()');
 
         $newX = $this->_currentX;
         $newY = $this->_currentY;
-        
         switch($this->_currentAngle){
         case 0:
             $newX++;
@@ -166,13 +167,18 @@ class Baseclass{
         case 270:
             $newY--;
             break;
-            default:
-            break;
         }
+        $stmt = $this->_dbh->prepare("SELECT id FROM map WHERE coordx = $newX AND coordy = $newY AND direction = $this->_currentAngle");
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $map_id = $result["id"];
+
+        $stmt = $this->_dbh->prepare("SELECT * FROM images WHERE $map_id=map_id");
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $newMap = $result["path"];
             $this->_currentX= $newX;
             $this->_currentY= $newY;
-            return $this->_goMoov($this->_currentX,$this->_currentY,$this->_currentAngle);
-    
     }
     public function _goBack(){
         $newX = $this->_currentX;
@@ -192,10 +198,17 @@ class Baseclass{
             $newY++;
             break;
     }
+    $stmt = $this->_dbh->prepare("SELECT id FROM map WHERE coordx = $newX AND coordy = $newY AND direction = $this->_currentAngle");
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $map_id = $result["id"];
+
+    $stmt = $this->_dbh->prepare("SELECT * FROM images WHERE $map_id=map_id");
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $newMap = $result["path"];
         $this->_currentX= $newX;
         $this->_currentY= $newY;
-
-        return $this->_goMoov($this->_currentX,$this->_currentY,$this->_currentAngle);
 
     }
     public function _goRight(){
@@ -216,10 +229,19 @@ class Baseclass{
             $newX++;
             break;
     }
+    $stmt = $this->_dbh->prepare("SELECT id FROM map WHERE coordx = $newX AND coordy = $newY AND direction = $this->_currentAngle");
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $map_id = $result["id"];
+
+    $stmt = $this->_dbh->prepare("SELECT * FROM images WHERE $map_id=map_id");
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $newMap = $result["path"];
+
         $this->_currentX= $newX;
         $this->_currentY= $newY;
 
-        return $this->_goMoov($this->_currentX,$this->_currentY,$this->_currentAngle);
     }
     public function _goLeft(){
         $newX = $this->_currentX;
@@ -239,18 +261,80 @@ class Baseclass{
                 $newX++;
                 break;
     }
+    $stmt = $this->_dbh->prepare("SELECT id FROM map WHERE coordx = $newX AND coordy = $newY AND direction = $this->_currentAngle");
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $map_id = $result["id"];
+
+    $stmt = $this->_dbh->prepare("SELECT * FROM images WHERE $map_id=map_id");
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $newMap = $result["path"];
         $this->_currentX= $newX;
         $this->_currentY= $newY;
-
-        return $this->_goMoov($this->_currentX,$this->_currentY,$this->_currentAngle);
     }
     public function _TurnRight(){
-        
+
+        $newAngle = $this->_currentAngle;
+        switch($this->_currentAngle){
+            case 0 : {
+                $newAngle =270;
+                break;
+            }
+            case 90 : {
+                $newAngle = 0;
+                break;
+            }
+            case 180 : {
+                $newAngle = 90;
+                break;
+            }
+            case 270 : {
+                $newAngle = 180;
+                break;
+            }
     }
-    public function _TurnLeft(){
-        
+    $stmt = $this->_dbh->prepare("SELECT id FROM map WHERE coordx = $this->_currentX AND coordy = $this->_currentY AND direction = $newAngle");
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $map_id = $result["id"];
+
+    $stmt = $this->_dbh->prepare("SELECT * FROM images WHERE $map_id=map_id");
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $newMap = $result["path"];
+    $this->_currentAngle = $newAngle;
     }
 
-}
+    public function _TurnLeft(){
+        $newAngle = $this->_currentAngle;
+        switch($this->_currentAngle){
+            case 0:
+                $newAngle=90;
+                break;
+            case 90:
+                $newAngle=180;
+                break;
+            case 180:
+                $newAngle=270;
+                break;
+            case 270:
+                $newAngle=0;
+                break;
+    }
+    $stmt = $this->_dbh->prepare("SELECT id FROM map WHERE coordx = $this->_currentX AND coordy = $this->_currentY AND direction = $newAngle");
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $map_id = $result["id"];
+
+    $stmt = $this->_dbh->prepare("SELECT * FROM images WHERE $map_id=map_id");
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $newMap = $result["path"];
+    $this->_currentAngle = $newAngle;
+    }
+    }
+
+
 
 ?>
