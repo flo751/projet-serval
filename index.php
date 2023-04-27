@@ -6,7 +6,7 @@
 
     $database = new DataBase();
     $baseclass = new Baseclass();
-    $firstpersonneview = new FirstPersonView();
+    //$firstpersonneview = new FirstPersonView();
     
     if(empty($_POST)){$baseclass->init();
     }else{
