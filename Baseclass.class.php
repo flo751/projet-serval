@@ -122,7 +122,7 @@ class Baseclass{
             $newY++;
             break;
         case 270:
-            $newX++;
+            $newX--;
             break;
     }
     return $this->_checkMove($newX,$newY,$this->_currentAngle);
