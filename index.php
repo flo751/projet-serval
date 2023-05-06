@@ -1,90 +1,106 @@
 <?php 
-
-    function chargerClasse($classe)
-    {require $classe . '.class.php';}
+session_start();
+function chargerClasse($classe)
+{
+    require $classe . '.class.php';
+}
     spl_autoload_register('chargerClasse');
-
     $database = new DataBase();
     $baseclass = new Baseclass();
-    //$firstpersonneview = new FirstPersonView();
-    
-    if(empty($_POST)){$baseclass->init();
-    }else{
-        $baseclass->set_currentx($_POST['X']);
-        $baseclass->set_currenty($_POST['Y']);
-        $baseclass->set_currentangle($_POST['Angle']);
-        $baseclass->set_currentmap($_POST['Map']);
-    }
+    $fpv = new FirstPersonView();
+    $fpt = new FirstPersonText();
+    $fpa = new FirstPersonAction();
 
-    if(isset ($_POST['turnleft'])){
-        $baseclass->_TurnLeft();
-   }
-   if(isset ($_POST['up'])){
-        $baseclass->_goForward();
-    }
-    if(isset ($_POST['turnright'])){
-         $baseclass->_TurnRight();
-    }
-    if(isset ($_POST['left'])){
-         $baseclass->_goLeft();
-    }
-    if(isset ($_POST['right'])){
-         $baseclass->_goRight();
-    }
-    if(isset ($_POST['down'])){
-         $baseclass->_goBack();
-    }
+
+if (empty($_POST)){ 
+    $baseclass->init();
+    $fpv->init();
     
+    }else{
+        $baseclass->set_currentX($_POST['X']);
+        $baseclass->set_currentY($_POST['Y']);
+        $baseclass->set_currentAngle($_POST['Angle']);
+        $baseclass->set_currentMapID($_POST['MapID']);
+    }
+//     var_dump("POST");
+// var_dump($_POST);
+// var_dump("baseclass");
+// var_dump($baseclass);
+// var_dump("fpv");
+// var_dump($fpv);
+
+
+if (isset($_POST['forward'])){
+    $baseclass->goForward();
+}
+if (isset($_POST['left'])){
+    $baseclass->goLeft();
+}
+if (isset($_POST['back'])){
+    $baseclass->goBack();
+}
+if (isset($_POST['right'])){
+    $baseclass->goRight();
+    
+}
+if (isset($_POST['turnleft'])){
+    $baseclass->turnLeft();
+    $fpv->_AnimCompass($baseclass);
+}
+if (isset($_POST['turnright'])){
+    $fpv->_AnimCompass($baseclass);
+    $baseclass->turnRight();
+}
+if (isset($_POST['action'])){
+    $fpa->doAction($baseclass);
+}
 ?>
-<!DOCTYPE HTML>
-<html>
-<head>
-    <link rel="stylesheet" href="index.css" />
-    <meta http-equiv="Content-Type" content="text/html ; charset=UTF-8">
-    <title>Page de test PHP</title>
-</head>
-<body>
+
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./assets/style.css">
+        <title>Doom-like - Projet Serval</title>
+    </head>
+    <body>
     <div class="background">
-        <img src="./images/<?php echo $baseclass->get_currentmap(); ?>">
+        <img src="./images/<?php echo $fpv->getView($baseclass);?>">
     </div>
         <div class="buttons">
             <table>
-                <form method='POST' action='index.php'>
+                <form method="POST" action="index.php">
                     <div class="control">
-                        <button type="submit" name="turnleft">\</button>
-                        <button type="submit" name="up" <?php if($baseclass->_checkForward() == FALSE){
-                            echo 'disabled';
-                        } ?>>^</button>
-                        <button type="submit" name="turnright">/</button>
+                        <button type="submit" name="turnleft">TL</button>
+
+                        <button type="submit" name="forward"<?php if($baseclass->checkForward() == TRUE){echo "enabled";} else {echo"disabled";} ?>>^</button>
+
+                        <button type="submit" name="turnright">TR</button>
                     </div>
                     <div>
-                        <button type="submit" name="left" <?php if($baseclass->_checkLeft() == FALSE){
-                            echo 'disabled';
-                        } ?>><</button>
-                        <button type="submit" name="action">X</button>
-                        <button type="submit" name="right" <?php if($baseclass->_checkRight() == FALSE){
-                            echo 'disabled';
-                        } ?>>></button>
+                        <button type="submit" id ="left" name="left"<?php if($baseclass->checkLeft() == TRUE){echo "enabled";} else {echo"disabled";} ?>><</button>
+
+                        <button type="submit" name="action"<?php if($fpa->checkAction($baseclass) == TRUE){echo "enabled";} else {echo"disabled";} ?>>X</button>
+
+                        <button type="submit" name="right"<?php if($baseclass->checkRight() == TRUE){echo "enabled";} else {echo"disabled";} ?>>></button>
                     </div>
                     <div>
-                        <button type="submit" name="down" <?php if($baseclass->_checkBack() == FALSE){
-                            echo 'disabled';
-                        } ?>>V</button>
+                        <button type="submit" name="back"<?php if($baseclass->checkBack() == TRUE){echo "enabled";} else {echo"disabled";} ?>>V</button>
                     </div>
-                    <input type="hidden" name="X" value="<?php echo $baseclass->get_currentx(); ?>">
-                    <input type="hidden" name="Y" value="<?php echo $baseclass->get_currenty(); ?>">
-                    <input type="hidden" name="Angle" value="<?php echo $baseclass->get_currentangle(); ?>">
-                    <input type="hidden" name="Map" value="<?php echo $baseclass->get_currentmap(); ?>">
+                    <input type="hidden" name="X" value="<?php echo $baseclass->get_currentX(); ?>">
+                    <input type="hidden" name="Y" value="<?php echo $baseclass->get_currentY(); ?>">
+                    <input type="hidden" name="Angle" value="<?php echo $baseclass->get_currentAngle(); ?>">
+                    <input type="hidden" name="MapID" value="<?php echo $baseclass->get_currentMapID(); ?>">
                 </form>
             </table>
         </div>
-        <div class="compass">
-            <img src="./assets/compass.png">
+        <div>
+            <img class="compass <?php  echo $fpv->_AnimCompass($baseclass); ?>">
         </div>
     </div>
-    <div class="text">
+    <div class="text"><?php echo $fpt->get_Text($baseclass);  ?>
     </div>
-    
     </body>
-    <?php var_dump($baseclass); ?>
 </html>

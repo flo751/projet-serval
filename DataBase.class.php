@@ -4,7 +4,7 @@ class DataBase extends PDO{
  
  private $_host='localhost';
  private $_username = 'root';
- private $_password ='root';
+ private $_password ='';
  private $_database = 'fpview';
 
 public function __construct(){
